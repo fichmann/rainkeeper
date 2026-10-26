@@ -1,0 +1,32 @@
+services:
+  rainkeeper:
+    build: .
+    image: rainkeeper:local
+    container_name: rainkeeper
+    restart: unless-stopped
+    network_mode: host
+    command: ["python", "-m", "uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8084"]
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8084/healthz',timeout=3)"]
+      interval: 60s
+      timeout: 5s
+      start_period: 60s
+      retries: 3
+    environment:
+      RAINKEEPER_ALLOWED_HOSTS: "${RAINKEEPER_ALLOWED_HOSTS:-127.0.0.1:8084,localhost:8084}"
+      RAINKEEPER_AUTH_FILE: /app/data/auth.json
+    volumes:
+      - ./data:/app/data
+    read_only: true
+    tmpfs:
+      - /tmp:size=16m
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    mem_limit: 256m
+    logging:
+      driver: json-file
+      options:
+        max-size: "5m"
+        max-file: "2"

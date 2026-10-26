@@ -1,0 +1,10 @@
+.venv/
+data/
+__pycache__/
+.env
+.env.*
+!.env.example
+.DS_Store
+*.tar.gz
+*.log
+.pytest_cache/
